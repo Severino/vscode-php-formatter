@@ -1,0 +1,398 @@
+{
+    "name": "dhc-php-converter",
+    "displayName": "DHC PHP Converter",
+    "description": "A configurable, rule-based, whitespace-only PHP formatter.",
+    "version": "0.1.0",
+    "publisher": "local",
+    "license": "MIT",
+    "icon": "logo.png",
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Formatters"
+    ],
+    "activationEvents": [
+        "onLanguage:php"
+    ],
+    "main": "./out/src/extension.js",
+    "contributes": {
+        "configuration": {
+            "title": "DHC PHP Converter",
+            "properties": {
+                "dhcConverter.php.indent.style": {
+                    "type": "string",
+                    "default": "editor",
+                    "markdownDescription": "Indentation character.",
+                    "enum": [
+                        "editor",
+                        "spaces",
+                        "tabs"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Follow the editor's `insertSpaces` / `tabSize` for the current file.",
+                        "Always indent with spaces.",
+                        "Always indent with tabs."
+                    ]
+                },
+                "dhcConverter.php.indent.size": {
+                    "type": "number",
+                    "default": 4,
+                    "markdownDescription": "Spaces per indentation level (only used when `indent.style` is `spaces`).",
+                    "minimum": 1,
+                    "maximum": 16
+                },
+                "dhcConverter.php.indent.switchCases": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Indent `case` / `default` labels one level inside `switch`."
+                },
+                "dhcConverter.php.indent.continuationLevels": {
+                    "type": "number",
+                    "default": 1,
+                    "markdownDescription": "Extra indentation levels for continuation lines of a statement (method chains, wrapped expressions, brace-less bodies).",
+                    "minimum": 0,
+                    "maximum": 4
+                },
+                "dhcConverter.php.lineEnding": {
+                    "type": "string",
+                    "default": "auto",
+                    "markdownDescription": "Line ending used for formatted whitespace.",
+                    "enum": [
+                        "auto",
+                        "lf",
+                        "crlf"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Use the line ending of the document.",
+                        "Unix line endings.",
+                        "Windows line endings."
+                    ]
+                },
+                "dhcConverter.php.finalNewline": {
+                    "type": "string",
+                    "default": "none",
+                    "markdownDescription": "Line breaks at the end of files that end in PHP mode. Files ending in inline HTML or `?>` are never touched.",
+                    "enum": [
+                        "none",
+                        "single",
+                        "keep"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "The file ends directly after the last token (no trailing newline, no empty last line).",
+                        "The file ends with exactly one newline.",
+                        "Leave the trailing line breaks as they are."
+                    ]
+                },
+                "dhcConverter.php.braces.classes": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Position of the opening brace of classes, interfaces, traits and enums.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "`{` stays on the line of the declaration.",
+                        "`{` is moved to its own line."
+                    ]
+                },
+                "dhcConverter.php.braces.anonymousClasses": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Position of the opening brace of anonymous classes.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "`{` stays on the line of the declaration.",
+                        "`{` is moved to its own line."
+                    ]
+                },
+                "dhcConverter.php.braces.functions": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Position of the opening brace of named functions and methods.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "`{` stays on the line of the declaration.",
+                        "`{` is moved to its own line."
+                    ]
+                },
+                "dhcConverter.php.braces.sameLineAfterMultilineParameters": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "When the parameter list of a named function / method ends with a `)` on its own line, keep the opening brace on that line (`) {`) even if `braces.functions` is `new-line` (PER-CS style)."
+                },
+                "dhcConverter.php.braces.closures": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Position of the opening brace of closures (`function () {}`).",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "`{` stays on the line of the declaration.",
+                        "`{` is moved to its own line."
+                    ]
+                },
+                "dhcConverter.php.braces.controlStructures": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Position of the opening brace of `if`, `else`, `for`, `foreach`, `while`, `do`, `switch`, `try`, `catch`, `finally` and `match`.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "`{` stays on the line of the declaration.",
+                        "`{` is moved to its own line."
+                    ]
+                },
+                "dhcConverter.php.controlStructures.elseKeyword": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Placement of `else` / `elseif` after the closing brace of the previous block.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Keyword follows the closing brace: `} else {`.",
+                        "Keyword starts a new line after the closing brace."
+                    ]
+                },
+                "dhcConverter.php.controlStructures.catchFinallyKeyword": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Placement of `catch` / `finally` after the closing brace of the previous block.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Keyword follows the closing brace: `} else {`.",
+                        "Keyword starts a new line after the closing brace."
+                    ]
+                },
+                "dhcConverter.php.controlStructures.doWhileKeyword": {
+                    "type": "string",
+                    "default": "same-line",
+                    "markdownDescription": "Placement of `while` after the closing brace of a `do` block.",
+                    "enum": [
+                        "same-line",
+                        "new-line"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Keyword follows the closing brace: `} else {`.",
+                        "Keyword starts a new line after the closing brace."
+                    ]
+                },
+                "dhcConverter.php.spaces.afterControlKeyword": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space between `if`, `elseif`, `for`, `foreach`, `while`, `switch`, `catch`, `match` and `(`."
+                },
+                "dhcConverter.php.spaces.beforeFunctionDeclarationParen": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space before `(` in `function name (...)`."
+                },
+                "dhcConverter.php.spaces.beforeClosureParen": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space before `(` in `function (...) {}`."
+                },
+                "dhcConverter.php.spaces.beforeArrowFunctionParen": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space before `(` in `fn (...) =>`."
+                },
+                "dhcConverter.php.spaces.beforeClosureUseParen": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space before `(` in `function () use (...)`."
+                },
+                "dhcConverter.php.spaces.beforeFunctionCallParen": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space between a function / method name and `(` in calls."
+                },
+                "dhcConverter.php.spaces.withinParentheses": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space inside non-empty parentheses: `( $a )`."
+                },
+                "dhcConverter.php.spaces.withinBrackets": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space inside non-empty square brackets: `[ 1, 2 ]`."
+                },
+                "dhcConverter.php.spaces.withinBraces": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space inside non-empty braces of blocks that sit on one line: `{ return 1; }`."
+                },
+                "dhcConverter.php.spaces.beforeComma": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space before `,`."
+                },
+                "dhcConverter.php.spaces.afterComma": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space after `,`."
+                },
+                "dhcConverter.php.spaces.beforeSemicolon": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space before `;`."
+                },
+                "dhcConverter.php.spaces.afterSemicolonInFor": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space after `;` inside `for (...)`."
+                },
+                "dhcConverter.php.spaces.aroundAssignment": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around `=`, `+=`, `.=`, `??=` and other assignment operators."
+                },
+                "dhcConverter.php.spaces.aroundComparison": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around `==`, `===`, `!=`, `!==`, `<`, `>`, `<=`, `>=`, `<=>`."
+                },
+                "dhcConverter.php.spaces.aroundLogical": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around `&&` and `||`."
+                },
+                "dhcConverter.php.spaces.aroundArithmetic": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around binary `+`, `-`, `*`, `/`, `%`, `**`."
+                },
+                "dhcConverter.php.spaces.aroundBitwise": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around binary `|`, `&`, `^`, `<<`, `>>`."
+                },
+                "dhcConverter.php.spaces.aroundConcat": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around the `.` concatenation operator."
+                },
+                "dhcConverter.php.spaces.aroundNullCoalescing": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around `??`."
+                },
+                "dhcConverter.php.spaces.aroundTernary": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around `?` and `:` of ternary expressions (`?:` is kept together)."
+                },
+                "dhcConverter.php.spaces.aroundDoubleArrow": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Spaces around `=>`."
+                },
+                "dhcConverter.php.spaces.aroundObjectOperator": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Spaces around `->`, `?->` and `::`."
+                },
+                "dhcConverter.php.spaces.afterCast": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space after a cast: `(int) $a`."
+                },
+                "dhcConverter.php.spaces.afterNot": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space after the `!` operator."
+                },
+                "dhcConverter.php.spaces.beforeReturnTypeColon": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Space before the `:` of a return type: `function f() : int`."
+                },
+                "dhcConverter.php.spaces.afterReturnTypeColon": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Space after the `:` of a return type."
+                },
+                "dhcConverter.php.blankLines.maxConsecutive": {
+                    "type": "number",
+                    "default": 1,
+                    "markdownDescription": "Maximum number of consecutive blank lines.",
+                    "minimum": 0,
+                    "maximum": 10
+                },
+                "dhcConverter.php.blankLines.removeAtBlockEdges": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Remove blank lines directly after `{` and directly before `}`."
+                },
+                "dhcConverter.php.blankLines.afterNamespace": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Ensure a blank line after `namespace Foo;`."
+                },
+                "dhcConverter.php.blankLines.afterUseImports": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Ensure a blank line after a block of top-level `use` imports."
+                },
+                "dhcConverter.php.blankLines.enforceBetweenFunctions": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Enforce an exact number of blank lines (`blankLines.betweenFunctions`) between a function / method (including its doc block, attributes and modifiers) and the neighbouring members. Disable to keep the existing spacing."
+                },
+                "dhcConverter.php.blankLines.betweenFunctions": {
+                    "type": "number",
+                    "default": 1,
+                    "markdownDescription": "Number of blank lines between functions / methods when `blankLines.enforceBetweenFunctions` is on.",
+                    "minimum": 0,
+                    "maximum": 10
+                },
+                "dhcConverter.php.comments.reindentDocBlocks": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Re-align the `*` of multi-line `/* */` and `/** */` comments with the comment start."
+                },
+                "dhcConverter.php.comments.trimTrailingWhitespace": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Remove trailing whitespace inside comments."
+                },
+                "dhcConverter.php.disabledRules": {
+                    "type": "array",
+                    "default": [],
+                    "markdownDescription": "Ids of formatter rules to switch off completely: braces, control-keyword-placement, keyword-spacing, parenthesis-spacing, punctuation-spacing, operator-spacing, blank-lines, comment-cleanup, indentation, final-newline.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "scripts": {
+        "compile": "tsc -p .",
+        "watch": "tsc -watch -p .",
+        "gen:config": "npm run compile && node scripts/generate-config.js",
+        "test": "npm run compile && node --test \"out/test/*.test.js\"",
+        "vscode:prepublish": "npm run compile"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/vscode": "^1.85.0",
+        "typescript": "^5.4.0"
+    }
+}

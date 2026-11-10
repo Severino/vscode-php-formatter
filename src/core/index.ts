@@ -1,0 +1,10 @@
+export { PhpFormatter, formatPhp, formatPhpEdits, applyEdits } from './formatter';
+export type { FormatResult, TextEdit } from './formatter';
+export { DEFAULT_OPTIONS, resolveOptions, optionsFromGetter } from './options';
+export type { FormatOptions, FormatEnvironment, DeepPartial } from './options';
+export { FormatContext } from './context';
+export type { Rule } from './rule';
+export { defaultRules } from './rules';
+export { OPTION_SCHEMA, buildConfigurationProperties } from './schema';
+export { lex } from './lexer';
+export { signature, isEquivalent } from './verify';
